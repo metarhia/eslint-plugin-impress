@@ -1,6 +1,6 @@
 {
   "name": "eslint-plugin-impress",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "ESLint plugin for compatibility with Impress Application Server",
   "main": "plugin.js",
   "scripts": {
@@ -25,6 +25,9 @@
   },
   "homepage": "https://github.com/aqrln/eslint-plugin-impress#readme",
   "devDependencies": {
+    "eslint": "^3.12.0"
+  },
+  "peerDependencies": {
     "eslint": "^3.12.0"
   }
 }
