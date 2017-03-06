@@ -1,31 +1,31 @@
 'use strict';
 
-var plugin = {};
+const plugin = {};
 module.exports = plugin;
 
-var processor = {};
+const processor = {};
 plugin.processors = {
   '.js': processor
 };
 
-var UNIX_NEWLINE = '\n';
-var UNIX_NEWLINE_LENGTH = 1;
-var WINDOWS_NEWLINE = '\r\n';
-var WINDOWS_NEWLINE_LENGTH = 2;
+const UNIX_NEWLINE = '\n';
+const UNIX_NEWLINE_LENGTH = 1;
+const WINDOWS_NEWLINE = '\r\n';
+const WINDOWS_NEWLINE_LENGTH = 2;
 
-var CONFIG_REGEX = /\/(config|schemas)\//;
-var APP_SCRIPT_REGEX =
+const CONFIG_REGEX = /\/(config|schemas)\//;
+const APP_SCRIPT_REGEX =
   /\/applications\/\w+\/(api|www|tasks|init|setup|model|lib)\//;
 
-processor.preprocess = function(text, filename) {
-  var knownPath = (
+processor.preprocess = (text, filename) => {
+  const knownPath = (
     CONFIG_REGEX.test(filename) || APP_SCRIPT_REGEX.test(filename)
   );
   if (!knownPath) {
     return [text];
   }
 
-  var trail = '';
+  let trail = '';
   if (text.endsWith(WINDOWS_NEWLINE)) {
     trail = WINDOWS_NEWLINE;
     text = text.slice(0, -WINDOWS_NEWLINE_LENGTH);
@@ -34,8 +34,8 @@ processor.preprocess = function(text, filename) {
     text = text.slice(0, -UNIX_NEWLINE_LENGTH);
   }
 
-  var isConfig = text.startsWith('{') || text.startsWith('[');
-  var isHandler = text.startsWith('(') || text.startsWith('function');
+  const isConfig = text.startsWith('{') || text.startsWith('[');
+  const isHandler = text.startsWith('(') || text.startsWith('function');
 
   if (isConfig || isHandler) {
     text = 'module.exports = ' + text + ';';
@@ -45,6 +45,4 @@ processor.preprocess = function(text, filename) {
   return [text];
 };
 
-processor.postprocess = function(messages/*, filename*/) {
-  return messages[0];
-};
+processor.postprocess = (messages/*, filename*/) => messages[0];
