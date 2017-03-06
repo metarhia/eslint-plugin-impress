@@ -17,10 +17,14 @@ const CONFIG_REGEX = /\/(config|schemas)\//;
 const APP_SCRIPT_REGEX =
   /\/applications\/\w+\/(api|www|tasks|init|setup|model|lib)\//;
 
+const MODULE_EXPORTS = 'module.exports = ';
+const USE_STRICT = '\'use strict\'; ';
+
+const modifiedFiles = new Set();
+
 processor.preprocess = (text, filename) => {
-  const knownPath = (
-    CONFIG_REGEX.test(filename) || APP_SCRIPT_REGEX.test(filename)
-  );
+  const knownPath = CONFIG_REGEX.test(filename) ||
+                    APP_SCRIPT_REGEX.test(filename);
   if (!knownPath) {
     return [text];
   }
@@ -34,15 +38,36 @@ processor.preprocess = (text, filename) => {
     text = text.slice(0, -UNIX_NEWLINE_LENGTH);
   }
 
-  const isConfig = text.startsWith('{') || text.startsWith('[');
+  const isConfig  = text.startsWith('{') || text.startsWith('[');
   const isHandler = text.startsWith('(') || text.startsWith('function');
 
   if (isConfig || isHandler) {
-    text = 'module.exports = ' + text + ';';
+    text = MODULE_EXPORTS + text + ';';
   }
 
-  text = '\'use strict\'; ' + text + trail;
+  text = USE_STRICT + text + trail;
+  modifiedFiles.add(filename);
   return [text];
 };
 
-processor.postprocess = (messages/*, filename*/) => messages[0];
+processor.postprocess = (messages, filename) => {
+  // `preprocess` returns only one element in the array, so there's only one in
+  // `postprocess` too.
+  messages = messages[0];
+
+  if (messages.length === 0) {
+    return messages;
+  }
+
+  const firstMsg = messages[0];
+  const isFirstLineOverflown = firstMsg.ruleId === 'max-len' &&
+                               firstMsg.line === 1;
+  const isUseStrictAdded = firstMsg.source.startsWith(USE_STRICT) &&
+                           modifiedFiles.has(filename);
+  // TODO(aqrln): respect user's max-len rule settings
+  const inducedOverflow = firstMsg.source.slice(USE_STRICT.length).length <= 80;
+  if (isFirstLineOverflown && isUseStrictAdded && inducedOverflow) {
+    messages.shift();
+  }
+  return messages;
+};
