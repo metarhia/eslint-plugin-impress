@@ -25,10 +25,10 @@
   },
   "homepage": "https://github.com/aqrln/eslint-plugin-impress#readme",
   "devDependencies": {
-    "eslint": "^3.17.0"
+    "eslint": "^4.6.1"
   },
   "peerDependencies": {
-    "eslint": "^3.17.0"
+    "eslint": ">=3.17.0 <5.0.0"
   },
   "engines": {
     "node:": ">=6.0.0"
