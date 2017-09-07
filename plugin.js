@@ -5,7 +5,7 @@ module.exports = plugin;
 
 const processor = {};
 plugin.processors = {
-  '.js': processor
+  '.js': processor,
 };
 
 const UNIX_NEWLINE = '\n';
