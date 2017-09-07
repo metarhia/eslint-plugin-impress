@@ -4,7 +4,7 @@
   "description": "ESLint plugin for compatibility with Impress Application Server",
   "main": "plugin.js",
   "scripts": {
-    "test": "npm run lint",
+    "test": "npm run -s lint",
     "lint": "eslint ."
   },
   "repository": {
