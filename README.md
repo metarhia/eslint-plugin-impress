@@ -1,5 +1,7 @@
 # eslint-plugin-impress
 
+[![Greenkeeper badge](https://badges.greenkeeper.io/metarhia/eslint-plugin-impress.svg)](https://greenkeeper.io/)
+
 [![Build Status](https://travis-ci.org/metarhia/eslint-plugin-impress.svg?branch=master)](https://travis-ci.org/metarhia/eslint-plugin-impress)
 
 [ESLint](http://eslint.org) plugin for
