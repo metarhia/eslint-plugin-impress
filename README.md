@@ -1,5 +1,7 @@
 # eslint-plugin-impress
 
+[![Build Status](https://travis-ci.org/metarhia/eslint-plugin-impress.svg?branch=master)](https://travis-ci.org/metarhia/eslint-plugin-impress)
+
 [ESLint](http://eslint.org) plugin for
 [Impress Application Server](https://github.com/metarhia/Impress)
 itself and any applications built with Impress.
