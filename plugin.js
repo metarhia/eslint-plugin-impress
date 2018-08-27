@@ -20,7 +20,7 @@ const APP_SCRIPT_REGEX =
 const MODULE_EXPORTS = 'module.exports = ';
 const USE_STRICT = '\'use strict\'; ';
 
-const modifiedFiles = new Set();
+const modifiedFiles = new Map();
 
 processor.preprocess = (text, filename) => {
   const knownPath = CONFIG_REGEX.test(filename) ||
@@ -41,12 +41,19 @@ processor.preprocess = (text, filename) => {
   const isConfig  = text.startsWith('{') || text.startsWith('[');
   const isHandler = text.startsWith('(') || text.startsWith('function');
 
+  const changes = {
+    prefix: '',
+    suffix: '',
+  };
+
   if (isConfig || isHandler) {
-    text = MODULE_EXPORTS + text + ';';
+    changes.prefix += MODULE_EXPORTS;
+    changes.suffix += ';';
   }
 
-  text = USE_STRICT + text + trail;
-  modifiedFiles.add(filename);
+  changes.prefix = USE_STRICT + changes.prefix;
+  text = changes.prefix + text + changes.suffix + trail;
+  modifiedFiles.set(filename, changes);
   return [text];
 };
 
@@ -62,11 +69,14 @@ processor.postprocess = (messages, filename) => {
   const firstMsg = messages[0];
   const isFirstLineOverflown = firstMsg.ruleId === 'max-len' &&
                                firstMsg.line === 1;
-  const isUseStrictAdded = firstMsg.source.startsWith(USE_STRICT) &&
-                           modifiedFiles.has(filename);
-  // TODO(aqrln): respect user's max-len rule settings
-  const inducedOverflow = firstMsg.source.slice(USE_STRICT.length).length <= 80;
-  if (isFirstLineOverflown && isUseStrictAdded && inducedOverflow) {
+  let inducedOverflow = false;
+  const changes = modifiedFiles.get(filename);
+  if (changes) {
+    // TODO(aqrln): respect user's max-len rule settings
+    inducedOverflow = firstMsg.source.length -
+      changes.prefix.length - changes.suffix.length <= 80;
+  }
+  if (isFirstLineOverflown && inducedOverflow) {
     messages.shift();
   }
   return messages;
