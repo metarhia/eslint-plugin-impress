@@ -51,9 +51,11 @@ processor.preprocess = (text, filename) => {
     changes.suffix += ';';
   }
 
+  const inducedOverflow = text.split('\n')[0].length <= 80;
+  modifiedFiles.set(filename, inducedOverflow);
+
   changes.prefix = USE_STRICT + changes.prefix;
   text = changes.prefix + text + changes.suffix + trail;
-  modifiedFiles.set(filename, changes);
   return [text];
 };
 
@@ -69,15 +71,10 @@ processor.postprocess = (messages, filename) => {
   const firstMsg = messages[0];
   const isFirstLineOverflown = firstMsg.ruleId === 'max-len' &&
                                firstMsg.line === 1;
-  let inducedOverflow = false;
-  const changes = modifiedFiles.get(filename);
-  if (changes) {
-    // TODO(aqrln): respect user's max-len rule settings
-    inducedOverflow = firstMsg.source.length -
-      changes.prefix.length - changes.suffix.length <= 80;
-  }
+  const inducedOverflow = modifiedFiles.get(filename);
   if (isFirstLineOverflown && inducedOverflow) {
     messages.shift();
   }
+
   return messages;
 };
