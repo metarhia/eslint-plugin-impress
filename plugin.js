@@ -3,7 +3,9 @@
 const plugin = {};
 module.exports = plugin;
 
-const processor = {};
+const processor = {
+  supportsAutofix: true,
+};
 plugin.processors = {
   '.js': processor,
 };
@@ -17,15 +19,14 @@ const CONFIG_REGEX = /\/(config|schemas)\//;
 const APP_SCRIPT_REGEX =
   /\/applications\/\w+\/(api|www|tasks|init|setup|model|lib)\//;
 
-const MODULE_EXPORTS = 'module.exports = ';
-const USE_STRICT = '\'use strict\'; ';
+const USE_STRICT = '\'use strict\';\n';
 
 const modifiedFiles = new Map();
 
 processor.preprocess = (text, filename) => {
-  const knownPath = CONFIG_REGEX.test(filename) ||
-                    APP_SCRIPT_REGEX.test(filename);
-  if (!knownPath) {
+  const extractedPath = CONFIG_REGEX.exec(filename) ||
+    APP_SCRIPT_REGEX.exec(filename);
+  if (!extractedPath) {
     return [text];
   }
 
@@ -38,22 +39,27 @@ processor.preprocess = (text, filename) => {
     text = text.slice(0, -UNIX_NEWLINE_LENGTH);
   }
 
-  const isConfig  = text.startsWith('{') || text.startsWith('[');
-  const isHandler = text.startsWith('(') || text.startsWith('function');
-
-  const changes = {
-    prefix: '',
-    suffix: '',
-  };
-
-  if (isConfig || isHandler) {
-    changes.prefix += MODULE_EXPORTS;
-    changes.suffix += ';';
+  if (text.endsWith(';')) {
+    text = text.slice(0, -1);
   }
 
-  changes.prefix = USE_STRICT + changes.prefix;
-  text = changes.prefix + text + changes.suffix + trail;
-  modifiedFiles.set(filename, changes);
+  const trimmedText = text.trim();
+
+  const isObj = trimmedText.startsWith('{') && trimmedText.endsWith('}');
+  const isArr = trimmedText.startsWith('[') && trimmedText.endsWith(']');
+  const isApi = extractedPath[1] === 'api';
+  let prefixLen = USE_STRICT.length;
+
+  if (isObj) {
+    text = `(${text});`;
+    prefixLen++;
+  }
+  if (isArr || isApi) {
+    text += ';';
+  }
+
+  text = USE_STRICT + text + trail;
+  modifiedFiles.set(filename, { isObj, prefixLen });
   return [text];
 };
 
@@ -66,18 +72,27 @@ processor.postprocess = (messages, filename) => {
     return messages;
   }
 
-  const firstMsg = messages[0];
-  const isFirstLineOverflown = firstMsg.ruleId === 'max-len' &&
-                               firstMsg.line === 1;
-  let inducedOverflow = false;
-  const changes = modifiedFiles.get(filename);
-  if (changes) {
-    // TODO(aqrln): respect user's max-len rule settings
-    inducedOverflow = firstMsg.source.length -
-      changes.prefix.length - changes.suffix.length <= 80;
-  }
-  if (isFirstLineOverflown && inducedOverflow) {
-    messages.shift();
+  const modifications = modifiedFiles.get(filename);
+
+  if (modifications) {
+    const { isObj, prefixLen } = modifications;
+    messages.forEach(message => {
+      if (message.line === 1) return;
+      message.line--;
+      if (isObj && message.line === 1 && message.column !== 1) {
+        message.column--;
+      }
+      if (message.fix && message.fix.range) {
+        if (
+          message.fix.range[0] > prefixLen && message.fix.range[1] > prefixLen
+        ) {
+          message.fix.range[0] -= prefixLen;
+          message.fix.range[1] -= prefixLen;
+        } else {
+          delete message.fix;
+        }
+      }
+    });
   }
   return messages;
 };
