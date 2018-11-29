@@ -39,22 +39,18 @@ processor.preprocess = (text, filename) => {
     text = text.slice(0, -UNIX_NEWLINE_LENGTH);
   }
 
-  if (text.endsWith(';')) {
-    text = text.slice(0, -1);
-  }
-
   const trimmedText = text.trim();
 
-  const isObj = trimmedText.startsWith('{') && trimmedText.endsWith('}');
+  const isObj = trimmedText.startsWith('{');
   const isArr = trimmedText.startsWith('[') && trimmedText.endsWith(']');
   const isApi = extractedPath[1] === 'api';
+  const isFunction = trimmedText.startsWith('function');
   let prefixLen = USE_STRICT.length;
 
   if (isObj) {
     text = `(${text});`;
     prefixLen++;
-  }
-  if (isArr || isApi) {
+  } else if (!trimmedText.endsWith(';') && (isArr || (isApi && !isFunction))) {
     text += ';';
   }
 
