@@ -17,7 +17,7 @@ const WINDOWS_NEWLINE_LENGTH = 2;
 
 const CONFIG_REGEX = /\/(config|schemas)\//;
 const APP_SCRIPT_REGEX =
-  /\/applications\/\w+\/(api|www|tasks|init|setup|model|lib)\//;
+  /\/applications\/\w+\/(api|www|tasks|init|setup|model|resources|lib)\//;
 
 const USE_STRICT = '\'use strict\';\n';
 
