@@ -16,16 +16,15 @@ const WINDOWS_NEWLINE = '\r\n';
 const WINDOWS_NEWLINE_LENGTH = 2;
 
 const CONFIG_REGEX = /\/(config|schemas)\//;
-const APP_SCRIPT_REGEX =
-  /\/applications\/\w+\/(api|www|tasks|init|setup|model|resources|lib)\//;
+const APP_SCRIPT_REGEX = /\/applications\/\w+\/(api|www|tasks|init|setup|model|resources|lib)\//;
 
-const USE_STRICT = '\'use strict\';\n';
+const USE_STRICT = "'use strict';\n";
 
 const modifiedFiles = new Map();
 
 processor.preprocess = (text, filename) => {
-  const extractedPath = CONFIG_REGEX.exec(filename) ||
-    APP_SCRIPT_REGEX.exec(filename);
+  const extractedPath =
+    CONFIG_REGEX.exec(filename) || APP_SCRIPT_REGEX.exec(filename);
   if (!extractedPath) {
     return [text];
   }
@@ -80,7 +79,8 @@ processor.postprocess = (messages, filename) => {
       }
       if (message.fix && message.fix.range) {
         if (
-          message.fix.range[0] > prefixLen && message.fix.range[1] > prefixLen
+          message.fix.range[0] > prefixLen &&
+          message.fix.range[1] > prefixLen
         ) {
           message.fix.range[0] -= prefixLen;
           message.fix.range[1] -= prefixLen;
