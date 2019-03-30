@@ -27,7 +27,7 @@
   "homepage": "https://github.com/aqrln/eslint-plugin-impress#readme",
   "files": [],
   "devDependencies": {
-    "eslint": "^5.9.0",
+    "eslint": "5.15.3",
     "eslint-config-metarhia": "^6.0.0",
     "eslint-config-prettier": "^3.5.0",
     "eslint-plugin-import": "^2.14.0",
