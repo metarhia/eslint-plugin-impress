@@ -32,7 +32,7 @@
     "eslint-config-prettier": "^3.5.0",
     "eslint-plugin-import": "^2.14.0",
     "eslint-plugin-prettier": "^3.0.1",
-    "prettier": "1.16.x"
+    "prettier": "~1.17.0"
   },
   "peerDependencies": {
     "eslint": ">=3.17.0"
