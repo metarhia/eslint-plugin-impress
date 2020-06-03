@@ -27,12 +27,12 @@
   "homepage": "https://github.com/aqrln/eslint-plugin-impress#readme",
   "files": [],
   "devDependencies": {
-    "eslint": "^5.9.0",
-    "eslint-config-metarhia": "^6.0.0",
-    "eslint-config-prettier": "^3.5.0",
-    "eslint-plugin-import": "^2.14.0",
-    "eslint-plugin-prettier": "^3.0.1",
-    "prettier": "1.16.x"
+    "eslint": "^7.1.0",
+    "eslint-config-metarhia": "^7.0.1",
+    "eslint-config-prettier": "^6.11.0",
+    "eslint-plugin-import": "^2.20.2",
+    "eslint-plugin-prettier": "^3.1.3",
+    "prettier": "^1.16.4"
   },
   "peerDependencies": {
     "eslint": ">=3.17.0"
