@@ -16,7 +16,8 @@ const WINDOWS_NEWLINE = '\r\n';
 const WINDOWS_NEWLINE_LENGTH = 2;
 
 const CONFIG_REGEX = /\/(config|schemas)\//;
-const APP_SCRIPT_REGEX = /\/applications\/\w+\/(api|www|tasks|init|setup|model|resources|lib)\//;
+const APP_SCRIPT_REGEX =
+  /\/applications\/\w+\/(api|www|tasks|init|setup|model|resources|lib)\//;
 
 const USE_STRICT = "'use strict';\n";
 
@@ -71,7 +72,7 @@ processor.postprocess = (messages, filename) => {
 
   if (modifications) {
     const { isObj, prefixLen } = modifications;
-    messages.forEach(message => {
+    messages.forEach((message) => {
       if (message.line === 1) return;
       message.line--;
       if (isObj && message.line === 1 && message.column !== 1) {
